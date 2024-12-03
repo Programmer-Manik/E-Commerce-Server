@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  contactNumber  String
+  address        String?
+  role           UserRole         @default(customer)
+  status         UserStatus       @default(active)
+  password       String
+  profilePhoto   String?
+  cretedAt       DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  product        Product[]
+  shop           Shop?
+  followUnfollow FollowUnfollow[]
+
+  @@map("users")
+}
+
+model Product {
+  id             String  @id @default(uuid())
+  name           String
+  title          String?
+  price          Int
+  category       String
+  inventoryCount Int
+  images         String?
+  discounts      Int?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  isDeleted Boolean  @default(false)
+  cretedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("products")
+}
+
+model Shop {
+  id    String @id @default(uuid())
+  name  String
+  title String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  logo           String?
+  followers      Int              @default(0)
+  isDeleted      Boolean          @default(false)
+  cretedAt       DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  product        Product[]
+  followUnfollow FollowUnfollow[]
+
+  @@map("shops")
+}
+
+model FollowUnfollow {
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  folowerEmail String
+  user         User   @relation(fields: [folowerEmail], references: [id])
+
+  @@id([shopId, folowerEmail])
+}
+
+enum UserRole {
+  customer
+  vendor
+  admin
+}
+
+enum UserStatus {
+  active
+  blocked
+  deleted
+}
