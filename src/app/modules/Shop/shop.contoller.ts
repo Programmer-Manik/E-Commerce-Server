@@ -52,6 +52,18 @@ const softDelete = catchAsync(async (req, res) => {
   });
 });
 
+const updateShop = catchAsync(async (req, res) => {
+  const user = (req as any).user;
+  const result = await ShopService.updateShop(user, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Shop update successfully",
+    data: result,
+  });
+});
+
 const deleteShop = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await ShopService.deleteShop(id as string);
@@ -70,4 +82,5 @@ export const ShopController = {
   getById,
   softDelete,
   deleteShop,
+  updateShop
 };

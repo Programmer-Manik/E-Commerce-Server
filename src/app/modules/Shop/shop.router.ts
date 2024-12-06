@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/", auth(UserRole.vendor), ShopController.createShop);
 
-router.get("/", ShopController.getAllShop);
+router.get("/", auth(UserRole.admin), ShopController.getAllShop);
 
 router.get("/:id", ShopController.getById);
 
@@ -19,5 +19,7 @@ router.delete(
 );
 
 router.delete("/:id", auth(UserRole.admin), ShopController.deleteShop);
+
+router.patch("/", auth(UserRole.vendor), ShopController.updateShop);
 
 export const ShopRoutes = router;

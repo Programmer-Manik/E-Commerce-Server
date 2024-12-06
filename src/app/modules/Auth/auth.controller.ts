@@ -7,10 +7,8 @@ import { StatusCodes } from "http-status-codes";
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthService.loginUser(req.body);
 
-  const { refreshToken } = result;
-
   res.cookie("refreshToken", refreshToken, {
-    secure: false, // must true in production
+    secure: true, // must true in production
     httpOnly: true,
   });
 
@@ -18,15 +16,12 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Logged in successfully",
-    data: {
-      accessToken: result.accessToken,
-    },
+    data: result,
   });
 });
 
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
-
 
   const result = await AuthService.refreshToken(refreshToken);
 
@@ -38,20 +33,48 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const changePassword = catchAsync(async (req: Request & {user?: any}, res: Response) => {
+const changePassword = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
     const user = req.user;
     const result = await AuthService.changePassword(user, req.body);
-  
+
     sendResponse(res, {
       statusCode: 200,
       success: true,
       message: "Password changed successfully!",
       data: result,
     });
+  }
+);
+
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.forgotPassord(req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Check your email!",
+    data: null,
   });
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const { token } = req.params;
+
+  const result = await AuthService.resetPassword(token, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Password Reset!",
+    data: null,
+  });
+});
 
 export const AuthController = {
   loginUser,
   refreshToken,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };

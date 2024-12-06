@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/", auth(UserRole.vendor), ProductController.createProduct);
 
-router.get("/", ProductController.getAllShop);
+router.get("/", ProductController.getAllProduct);
 
 router.get("/:id", ProductController.getById);
 

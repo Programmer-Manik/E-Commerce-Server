@@ -46,8 +46,22 @@ const shopFollowCount = catchAsync(async (req, res) => {
   });
 });
 
+const checkMyFollow = catchAsync(async (req, res) => {
+  const user = (req as any).user;
+  const { id } = req.params;
+  const result = await FollowerService.checkMyFollow(user as any, id as string);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "check my follow successfully",
+    data: { isFollow: result },
+  });
+});
+
 export const FollowerController = {
   createFollow,
   createUnfollow,
   shopFollowCount,
+  checkMyFollow,
 };

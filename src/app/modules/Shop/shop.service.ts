@@ -35,12 +35,22 @@ const getAllShop = async () => {
 };
 
 const getById = async (id: string) => {
-  const result = await prisma.shop.findUniqueOrThrow({
+  let result;
+  result = await prisma.shop.findUnique({
     where: {
       id,
       isDeleted: false,
     },
   });
+
+  if (!result) {
+    result = await prisma.shop.findFirstOrThrow({
+      where: {
+        userId: id,
+        isDeleted: false,
+      },
+    });
+  }
 
   return result;
 };
@@ -53,14 +63,14 @@ const softDelete = async (user: any, id: string) => {
     },
   });
 
-if(user && user.role != 'admin'){
-  await prisma.shop.findUniqueOrThrow({
-    where: {
-      id,
-      userId: vendorData.id,
-    },
-  });
-}
+  if (user && user.role != "admin") {
+    await prisma.shop.findUniqueOrThrow({
+      where: {
+        id,
+        userId: vendorData.id,
+      },
+    });
+  }
 
   const result = await prisma.shop.update({
     where: {
@@ -82,10 +92,38 @@ const deleteShop = async (id: string) => {
   return result;
 };
 
+const updateShop = async (user: any, payload: any) => {
+  const vendorData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.active,
+    },
+  });
+
+  const shopInfo = await prisma.shop.findUniqueOrThrow({
+    where: {
+      userId: vendorData.id,
+      isDeleted: false,
+    },
+  });
+
+  const result = await prisma.shop.update({
+    where: {
+      id: shopInfo.id,
+    },
+    data: {
+      ...payload,
+    },
+  });
+  return result;
+
+};
+
 export const ShopService = {
   createShop,
   getAllShop,
   getById,
   softDelete,
   deleteShop,
+  updateShop,
 };

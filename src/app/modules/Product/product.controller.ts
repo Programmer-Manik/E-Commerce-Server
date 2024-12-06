@@ -2,6 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { ProductService } from "./product.service";
+import pick from "../../../shared/pick";
+import { productFilterableFields } from "./product.constant";
 
 const createProduct = catchAsync(async (req, res) => {
   const user = (req as any).user;
@@ -15,8 +17,11 @@ const createProduct = catchAsync(async (req, res) => {
   });
 });
 
-const getAllShop = catchAsync(async (req, res) => {
-  const result = await ProductService.getAllProduct();
+const getAllProduct = catchAsync(async (req, res) => {
+  const filters = pick(req.query, productFilterableFields);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+
+  const result = await ProductService.getAllProduct(filters, options);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -28,7 +33,8 @@ const getAllShop = catchAsync(async (req, res) => {
 
 const getById = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await ProductService.getById(id as string);
+  const { userId } = req.query;
+  const result = await ProductService.getById(id as string, userId as string);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -40,7 +46,7 @@ const getById = catchAsync(async (req, res) => {
 
 const getMyProduct = catchAsync(async (req, res) => {
   const user = (req as any).user;
-  const result = await ProductService.getMyProduct(user);
+  const result = await ProductService.getMyProduct(user as any);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -94,7 +100,11 @@ const updateProduct = catchAsync(async (req, res) => {
 
 const getProductsByShopId = catchAsync(async (req, res) => {
   const { shopId } = req.params;
-  const result = await ProductService.getProductsByShopId(shopId as string);
+  const { limit } = req.query;
+  const result = await ProductService.getProductsByShopId(
+    shopId as string,
+    Number(limit)
+  );
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -106,7 +116,7 @@ const getProductsByShopId = catchAsync(async (req, res) => {
 
 export const ProductController = {
   createProduct,
-  getAllShop,
+  getAllProduct,
   getById,
   softDelete,
   deleteProduct,

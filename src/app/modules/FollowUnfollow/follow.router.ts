@@ -17,9 +17,12 @@ router.delete(
   FollowerController.createUnfollow
 );
 
+router.get("/follow-count/:id", FollowerController.shopFollowCount);
+
 router.get(
-  "/follow-count/:id",
-  FollowerController.shopFollowCount
+  "/check-my-follow/:id",
+  auth(UserRole.admin, UserRole.customer, UserRole.vendor),
+  FollowerController.checkMyFollow
 );
 
 export const FollowerRoutes = router;

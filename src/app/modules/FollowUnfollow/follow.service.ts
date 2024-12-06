@@ -63,8 +63,33 @@ const shopFollowCount = async (shopId: string) => {
   return result;
 };
 
+const checkMyFollow = async (user: any, shopId: string) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.active,
+    },
+  });
+  const result = await prisma.followUnfollow.findUnique({
+    where: {
+      shopId_folowerEmail: {
+        folowerEmail: userData.id,
+        shopId: shopId,
+      },
+    },
+  });
+
+  if (result) {
+    return true;
+  } else {
+    return false;
+  }
+
+};
+
 export const FollowerService = {
   createFollow,
   createUnfollow,
   shopFollowCount,
+  checkMyFollow,
 };
