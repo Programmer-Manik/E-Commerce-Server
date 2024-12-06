@@ -15,7 +15,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
     res.send({
-        message: "l2-a9-server...",
+        message: "E-Commerce-Server",
     });
 });
 app.use("/api/v1", routes_1.default);

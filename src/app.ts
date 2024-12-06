@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req: Request, res: Response) => {
   res.send({
-    message: "l2-a9-server...",
+    message: "E-Commerce-Server",
   });
 });
 
